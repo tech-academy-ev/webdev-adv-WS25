@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+  frontend:
+    image: node:lts-alpine
+    working_dir: /home/node/app
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./frontend/:/home/node/app
+    ports:
+      # Expose node port (3000) to localhost:80
+      # This allows access in browser through http://localhost without specific port
+      - "80:3000"
+    command: "npm start"
+    # Only start after backend is fully up
+    depends_on:
+      - backend
+  backend:
+    # "build" the backend python image, including necessary scripts and installing requirements
+    build:
+      context: ./backend
+      dockerfile: ./backend/Dockerfile
+    # Expose port 5000 to localhost
+    ports:
+      - "5000:5000"
+    # Only run after postgresql is started
+    depends_on:
+      - postgresql
+  postgresql:
+    image: postgres:15-alpine
+    container_name: postgresql
+    environment:
+      - POSTGRES_USER: ${POSTGRES_USER}
+      - POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    # Expose port 5432 to localhost
+    ports:
+      - "5432:5432"
