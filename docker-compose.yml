@@ -11,7 +11,7 @@ services:
       # Expose node port (3000) to localhost:80
       # This allows access in browser through http://localhost without specific port
       - "80:3000"
-    command: "npm start"
+    command: sh -c "npm install && npm start"
     # Only start after backend is fully up
     depends_on:
       - backend
@@ -22,11 +22,10 @@ services:
       dockerfile: ./Dockerfile
     # Expose port 5000 to localhost
     ports:
-      - "5000:5000"
-    # Only run after postgresql is started
+      - "5001:5000"
+    # Only run after postgresql is started and healthcheck is successful
     depends_on:
-      postgresql:
-        condition: service_healthy
+      - postgresql
   postgresql:
     image: postgres:15-alpine
     environment:
@@ -37,7 +36,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
+      test: [ "CMD-SHELL", "pg_isready -d $POSTGRES_DB -U $POSTGRES_USER" ]
       interval: 5s
       timeout: 30s
       retries: 10
