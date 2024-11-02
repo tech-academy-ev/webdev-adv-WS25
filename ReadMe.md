@@ -9,12 +9,7 @@ POSTGRES_DB=my_database
 
 Now, open a `terminal` in your projects root-folder and then run the following command:
 ```bash
-docker compose up
-```
-
-In order to restart your frontend container, run this command:
-```bash
-docker-compose restart frontend
+docker compose up --force-recreate
 ```
 
 You will see console output notifying you that your API, backend, and frontend are running.
